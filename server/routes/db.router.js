@@ -1,6 +1,3 @@
-/* eslint-disable no-shadow */
-/* eslint-disable no-underscore-dangle */
-/* eslint-disable max-len */
 /* eslint-disable no-console */
 const { Router } = require('express');
 // const axios = require('axios');
@@ -291,7 +288,8 @@ dbRouter.delete('/data/park/:id', (req, res) => {
 //     });
 // });
 
-// changes a dog's number in the barkPoint database and adds a notification to their user's notifs array
+// changes a dog's number in the barkPoint
+// database and adds a notification to their user's notifs array
 dbRouter.put('/data/notifications/:email', (req, res) => {
   const { email } = req.params;
   const notif = `BarkPoint subscription number changed to ${req.body.number}.`;
@@ -340,12 +338,12 @@ dbRouter.get('/findUsers', (req, res) => {
   });
 });
 
-/*  This route will update a user's messages array when that user sends
-    another user a message, send text notifications to the recipient user, and update the recipient user's
-*   notification's array
+/* This route will update a user's messages array when that user sends
+*  another user a message, send text notifications to the recipient
+*  user, and update the recipient user's
+*  notification's array
 */
 dbRouter.post('/messages/:currentUser', (req, res) => {
-  const notif = 'BarkPoint user messaged you.';
   User.User.findOne({ email: req.params.currentUser })
     .then((data) => {
       const newMessage = data.messages;
@@ -372,10 +370,11 @@ dbRouter.post('/messages/:currentUser', (req, res) => {
         }).then(() => {
           Dog.findDogs(req.body.user)
             .then((result) => {
+              const notif = `${data.name} messaged you.`;
               User.addNotif(req.body.user, notif).then(() => {
                 twilio.messages
                   .create({
-                    body: 'BarkPoint user messaged you.',
+                    body: `${data.name} messaged you.`,
                     from: '+12678677568',
                     statusCallback: 'http://postb.in/1234abcd',
                     to: result[0].number,
@@ -396,7 +395,8 @@ dbRouter.post('/messages/:currentUser', (req, res) => {
 });
 
 /*  This route will find the user being searched for and add his/her
-*   id to the current users "friendRequest" array, send a text notification to that user, and update that user's
+*   id to the current users "friendRequest" array, send a text
+*   notification to that user, and update that user's
 *   notification's array
 */
 
@@ -411,7 +411,6 @@ dbRouter.get('/userEmail/:name', (req, res) => {
 // id to the current users "friendRequest" array.
 
 dbRouter.get('/findFriend/:friend/:currentUser', (req, res) => {
-  const notif = 'BarkPoint user has sent a friend request.';
   const { currentUser } = req.params;
   User.User.findOne({ name: currentUser })
     .then((currentUser) => {
@@ -434,12 +433,13 @@ dbRouter.get('/findFriend/:friend/:currentUser', (req, res) => {
         }).then(() => {
           User.User.findOne({ name: req.params.friend })
             .then((recipient) => {
+              const notif = `${currentUser.name} has sent a friend request.`;
               User.addNotif(recipient.email, notif).then(() => {
                 Dog.findDogs(recipient.email)
                   .then((dog) => {
                     twilio.messages
                       .create({
-                        body: 'BarkPoint user has sent you a friend request.',
+                        body: `${currentUser.name} has sent you a friend request.`,
                         from: '+12678677568',
                         statusCallback: 'http://postb.in/1234abcd',
                         to: dog[0].number,
@@ -493,7 +493,6 @@ dbRouter.get('/friendRequests/:user', (req, res) => {
 });
 
 dbRouter.put('/responseToFriendRequest', (req, res) => {
-  notif = 'BarkPoint user has accepted your friend request.';
   const userId = req.body.id;
   const currentUser = req.body.user;
   const { response } = req.body;
@@ -512,6 +511,7 @@ dbRouter.put('/responseToFriendRequest', (req, res) => {
             { _id: userId },
             { $push: { friends: String(data._id) } },
           ).then((data) => {
+            const notif = `${currentUser} has accepted your friend request.`;
             User.addNotif(data.email, notif).then(() => {
               console.log('data');
               Dog.findDogs(data.email)
@@ -519,7 +519,7 @@ dbRouter.put('/responseToFriendRequest', (req, res) => {
                   User.addNotif(data.email, notif).then(() => {
                     twilio.messages
                       .create({
-                        body: 'BarkPoint user has accepted your friend request.',
+                        body: `${currentUser} has accepted your friend request.`,
                         from: '+12678677568',
                         statusCallback: 'http://postb.in/1234abcd',
                         to: result[0].number,
@@ -612,7 +612,8 @@ dbRouter.put('/unfriend', (req, res) => {
 // });
 
 dbRouter.get('/messages/:currentUser', (req, res) => {
-  User.User.findOne({ email: req.params.currentUser }).then((currentUser) => res.send(currentUser.messages));
+  User.User.findOne({ email: req.params.currentUser })
+    .then((currentUser) => res.send(currentUser.messages));
 });
 
 dbRouter.post('/messages/:currentUser', (req, res) => {

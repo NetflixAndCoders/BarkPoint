@@ -4,6 +4,8 @@ import './FriendRequests.css';
 import { Typography, Button, Grid } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 
+const socket = io();
+
 const useStyles = makeStyles(() => ({
   requestContainer: {
     flexGrow: 1,
@@ -47,11 +49,11 @@ const FriendRequests = () => {
       axios
         .put('/responseToFriendRequest', { id, user: data.name, response })
         .then(({ data }) => {
-          console.info(data, '-----');
           setFriendRequestResponse(data);
 
+          socket.emit('Accepted');
+
           setTimeout(() => {
-            console.info('set timeout');
             setFriendRequestResponse('');
             getFriendRequests();
           }, 500);

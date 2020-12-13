@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import {
-  List, ListItem, ListItemText,
+  List, ListItem, ListItemText, Typography,
 } from '@material-ui/core';
 import NotificationsIcon from '@material-ui/icons/Notifications';
 
@@ -12,12 +12,14 @@ const Sidebar = () => {
   const [notifs, setNotifs] = useState([]);
   const links = [
     { title: 'My Dogs', path: '/profile' },
-    { title: 'Friends List', path: '/friendsList' },
+    { title: 'Pup Budz', path: '/friendsList' },
     { title: 'Calendar', path: '/calendar' },
   ];
 
   const getNotifsNumber = () => {
-    axios.get('/session').then(({ data }) => axios.get(`/data/notifications/${data.email}`))
+    axios
+      .get('/session')
+      .then(({ data }) => axios.get(`/data/notifications/${data.email}`))
       .then(({ data }) => {
         console.info('DATA', data.notifs);
         setNotifs(data.notifs);
@@ -34,7 +36,10 @@ const Sidebar = () => {
   socket.on('waiting', () => getNotifsNumber());
 
   return (
-    <div className="SidebarProfile">
+    <div
+      className="SidebarProfile"
+      style={{ position: 'fixed', top: '65px', zIndex: '1' }}
+    >
       <List
         component="nav"
         aria-labelledby="side navigation"
@@ -51,14 +56,14 @@ const Sidebar = () => {
           <ListItem button className="sideBarRow">
             <ListItemText primary="Notifications" />
             <NotificationsIcon />
-            <div
-              style={{ color: (notifs.length > 0) ? 'red' : '#012626' }}
+            <Typography
+              style={{ color: 'white' }}
               onClick={() => console.info(notifs)}
             >
               {' '}
               {notifs.length}
               {' '}
-            </div>
+            </Typography>
           </ListItem>
         </Link>
       </List>
